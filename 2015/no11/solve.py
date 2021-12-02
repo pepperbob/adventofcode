@@ -1,26 +1,48 @@
 
-# 97  = a
-# 122 = z
+all_abc = [chr(i) for i in range(97,123)]
 
-def increment(x):
-    xx = list(reversed(x))
-    l = 0
-    while(True):
-        if(l > len(xx)-1):
-            xx.append("a")
-            break
+nots = ["i","o","l"]
+dobles = []
+for a in all_abc:
+    dobles.append(f"{a}{a}")
 
-        curr = xx[l]
-        if curr == "z":
-            xx[l] = "a"
-            l += 1
+musts = []
+rest_abc = all_abc
+while(len(rest_abc)>2):
+    musts.append(rest_abc[:3])
+    rest_abc = rest_abc[1:]
+musts = ["".join(a) for a in musts]
+
+def is_valid(s):
+    if any(i in s for i in nots):
+        return False
+    elif not any(a in s for a in musts):
+        return False
+    elif len([a for a in dobles if a in s])<2:
+        return False        
+    return True
+
+def inc_char(ch):
+    x = all_abc.index(ch)
+    nidx = 0 if x == 25 else x + 1 
+    return (all_abc[nidx], nidx==0)
+
+def inc2(x):
+    inced = ""
+    cont = True
+    for s in reversed(x):
+        if(not cont):
+            inced = s + inced
         else:
-            xx[l]=chr(ord(curr)+1)
-            break
-    
-    return "".join(list(reversed(xx)))
+            new_c,cont = inc_char(s)
+            inced = new_c + inced
+    return inced
 
-input = "vzbxkghb"
-for x in range(0, 2600000):
-    input = increment(input)
-    print(input)
+input = "vzbxxyzz"
+
+valid = False
+while(not valid):
+    input = inc2(input)
+    valid = is_valid(input)
+    print(f"{input} = {valid}")
+    
