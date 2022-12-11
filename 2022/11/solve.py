@@ -12,6 +12,7 @@ class Monkey:
         self.name = f"Monkey {self.id}"
         self.items = [int(x) for x in FIND_ALL_NUMBERS.findall(items)]
         self.operation = re.compile(r"Operation.*: new\s+=(.+)").findall(operation)[0].strip()
+        self.operation = eval(f"lambda old: {self.operation}")
         self.test = int(FIND_ALL_NUMBERS.findall(test)[0])
         self.ifTrue = FIND_MONKEY_ID.findall(ifTrue)[0]
         self.ifFalse = FIND_MONKEY_ID.findall(ifFalse)[0]
@@ -28,7 +29,7 @@ class Monkey:
         for i in range(len(self.items)):
             self.inspectedItems += 1
             old = self.items.pop(0)
-            new = (eval(self.operation.replace("old", f"{old}")) % self.divisor) // self.worryLevel
+            new = (self.operation(old) % self.divisor) // self.worryLevel
             if new % self.test == 0:
                 monkeys[self.ifTrue].accept(new)
             else:
@@ -49,7 +50,7 @@ def initMonkeys(notes, worry=3):
 
     # update all monkeys with a common modulo divisor, to just keep remainders and 
     # handle very large numbers of part 2
-    monkeys_divisor = reduce(lambda x, y: x * y, [x.test for x in monkeys.values()])
+    monkeys_divisor = math.prod([x.test for x in monkeys.values()])
     for m in monkeys.values():
         m.setCommonDivisor(monkeys_divisor)
 
