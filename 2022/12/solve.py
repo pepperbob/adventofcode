@@ -2,13 +2,13 @@
 DIRECTIONS = [(0,1), (0,-1), (1,0), (-1,0)]
 
 def find(what, landscape):
-    return [[(x,y)] for x in range(len(landscape)) for y in range(len(landscape[0])) if landscape[x][y]==what]
+    return [(x,y) for x in range(len(landscape)) for y in range(len(landscape[0])) if landscape[x][y]==what]
 
 input = [list(x) for x in open("input", "r").read().split("\n")]
 
 # dimensions
 dim = [len(input)-1, len(input[0])-1]
-posE = find("E", input)[0][0]
+posE = find("E", input)[0]
 
 def makeLandscape(input):
     landscape = []
@@ -29,24 +29,22 @@ def makeLandscape(input):
 print(f"Finish {posE}")
 
 def runFromStartingPoints(startingPoints, landscape):
-    observedPaths = startingPoints
-    print(f"Start {startingPoints}")
-
-    positionsWeVisited = set()
+    print(f"Starting from {len(startingPoints)} position/s")
+    observedPoints = startingPoints
+    pointsWeVisitedAlready = set()
 
     areWeDone = False
     iteration = 0
     while True:
         iteration += 1
 
-        numberOfPaths = len(observedPaths)
-        nextPaths = []
+        numberOfPaths = len(observedPoints)
+        nextSteps = []
         
         # iterate through the paths and spawn new paths
         for pathIndex in range(numberOfPaths):
             # currentPos of currentPath
-            currentPath = observedPaths[pathIndex]
-            lastStep = observedPaths[pathIndex][-1]
+            lastStep = observedPoints[pathIndex]
 
             for d in DIRECTIONS:
                 nextStep = (lastStep[0]+d[0], lastStep[1]+d[1])
@@ -54,15 +52,14 @@ def runFromStartingPoints(startingPoints, landscape):
                     # out of bounds
                     continue
 
-                if landscape[nextStep[0]][nextStep[1]] > landscape[lastStep[0]][lastStep[1]]+1 or nextStep in positionsWeVisited:
+                if landscape[nextStep[0]][nextStep[1]] > landscape[lastStep[0]][lastStep[1]]+1 or nextStep in pointsWeVisitedAlready:
                     # to high or already been there
                     continue
                             
-                positionsWeVisited.add(nextStep)
+                pointsWeVisitedAlready.add(nextStep)
 
-                # spwan new path
-                newlySpawned = currentPath+[nextStep]
-                nextPaths.append(newlySpawned)
+                # continue from here in next iteration
+                nextSteps.append(nextStep)
                 
                 # if we hit posE we're done!
                 if nextStep == posE:
@@ -73,20 +70,20 @@ def runFromStartingPoints(startingPoints, landscape):
                 break
 
         # observe new paths form now on
-        observedPaths = nextPaths
+        observedPoints = nextSteps
         
         if areWeDone:
             break
-
-        if iteration % 10 == 0:
-            print(f"Observing: {len(observedPaths)} after iteration {iteration}")
     
-    return (iteration, observedPaths)
+    return iteration
 
 # Part 1
-shortest, paths = runFromStartingPoints(find("S", input), makeLandscape(input))
-print(f"Part 1 - shortest: {shortest}")
+print("Part 1")
+shortest = runFromStartingPoints(find("S", input), makeLandscape(input))
+print(f"Shortest: {shortest} steps")
+print("")
 
 # Part 2
-shortest, paths = runFromStartingPoints(find("a", input), makeLandscape(input))
-print(f"Part 2 - shortest: {shortest}")
+print("Part 2")
+shortest = runFromStartingPoints(find("a", input), makeLandscape(input))
+print(f"Shortest: {shortest} steps")
