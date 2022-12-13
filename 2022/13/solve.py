@@ -2,30 +2,22 @@
 def assureLists(left, right):
     return left if type(left) == list else [left], right if type(right) == list else [right]
 
-def itemInOrder(left, right):
-    if left == right:
-        return None
-    return left < right
+def compareInt(left, right):
+    return (left < right) - (left > right)
 
 def inOrder(left, right):
     if type(left) == int and type(right) == int:
-        return itemInOrder(left, right)
+        return compareInt(left, right)
 
     listLeft, listRight = assureLists(left, right)
-    minLen = min(len(listLeft), len(listRight))
+    lenLeft, lenRight = len(listLeft), len(listRight)
 
-    isInOrder = None
-    for i in range(minLen):
+    for i in range(min(lenLeft, lenRight)):
         isInOrder = inOrder(listLeft[i], listRight[i])
-        if isInOrder is not None:
+        if isInOrder:
             return isInOrder
     
-    if len(listLeft) < len(listRight):
-        return True
-    if len(listRight) < len(listLeft):
-        return False
-
-    return None
+    return compareInt(lenLeft, lenRight)
 
 # read input
 input = [list(map(lambda a: eval(a), x.split("\n"))) for x in open("input", "r").read().split("\n\n")]
@@ -51,7 +43,7 @@ while goon:
         left, right = all[indexLeft], all[indexRight]
         sorted = inOrder(left, right)
         
-        if sorted is None or sorted == True:
+        if sorted != -1:
             continue
         else:
             all[indexLeft] = right
