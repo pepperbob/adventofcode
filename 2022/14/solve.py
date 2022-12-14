@@ -1,29 +1,25 @@
 split = lambda x: x.split(",")
-toInt = lambda x: int(x)
 
 def signum(i):
-    if i < 0:
-        return -1
-    return 0 if i == 0 else 1
+    return (0<i)-(i<0)
 
 def positionRange(a, b):
     # inclusive range between "a" and "b", no diagonals
-    diffx, diffy = b[0]-a[0], b[1]-a[1]
-    positions = [a]
-    add = (signum(diffx), signum(diffy))
+    ax, ay = a
+    diffx, diffy = b[0]-ax, b[1]-ay
+    addx, addy = (signum(diffx), signum(diffy))
+    positions = set([a, b])
     for i in range(1, abs(diffx) + abs(diffy)):
-        na = (positions[0][0]+add[0]*i, positions[0][1]+add[1]*i)
-        positions.append(na)
-    positions.append(b)
-    return set(positions)
+        positions.add((ax+addx*i, ay+addy*i))
+    return positions
 
 def buildCave(caveWallTuples):
     cave = set()
     for wall in caveWallTuples:
         for x in range(1, len(wall)):
-            cave = cave.union(positionRange(wall[x-1], wall[x]))
-    
-    return cave, max([x[1] for x in cave])
+            cave |= positionRange(wall[x-1], wall[x])
+
+    return cave, max(y for _, y in cave)
 
 def letSandSink(cave, deepest, behindDeepest):    
     newSand = ENTRY
@@ -48,10 +44,9 @@ def letSandSink(cave, deepest, behindDeepest):
     return currentSand
 
 # Setup - the most stupid code
-puzzleInput = [x.split(" ") for x in open("input", "r").read().replace("-> ", "").split("\n")]
 caveDescription = []
-for rawPos in puzzleInput:
-    caveDescription.append([tuple(map(toInt, corr)) for corr in map(split, rawPos)])
+for rawPos in [x.split(" ") for x in open("input", "r").read().replace("-> ", "").split("\n")]:
+    caveDescription.append([tuple(map(int, corr)) for corr in map(split, rawPos)])
 
 ENTRY = (500, 0)
 ABYSS = lambda c: None
