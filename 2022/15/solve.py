@@ -36,6 +36,12 @@ def part1(sensorsbeacons):
 
     print(f"Beancons cannot be: {len(nobeacons)}")
 
-x = 4*10**6
 
-print(x)
+def part2(sensorsbeacons):
+    for sx, sy, bx, by in sensorsbeacons:
+        dist = distance((sx, sy),  (bx, by))
+        print((sx, sy), end=":")
+        print(dist, end=" -- ")
+        print((dist+dist)**2)
+
+part2(sensorsbeacons)
