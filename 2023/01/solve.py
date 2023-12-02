@@ -1,6 +1,5 @@
 # Good Luck
 
-digits = "123456789"
 digitsmap = {
     "one": "1",
     "two": "2",
@@ -12,21 +11,30 @@ digitsmap = {
     "eight": "8",
     "nine": "9"
 }
-input = open("input.txt").read().splitlines()
 
-res = []
-for line in input:
-    t = []
-    for i, d in enumerate(line):
-        if d in digits:
-            t.append(int(d))
-            continue
-        
-        ## for part 2
-        for x in digitsmap:
-            if list(x) == list(line)[i:i+len(x)]:
-                t.append(digitsmap[x])
+def concat_first_last_digit(calibration_values, solve_part_two=False):
+    res = []
+    for line in calibration_values:
+        t = []
+        for i, d in enumerate(line):
+            ## for part 1
+            if d.isdigit():
+                t.append(int(d))
+                continue
+            
+            ## for part 2
+            if solve_part_two:
+                for x in digitsmap:
+                    if list(x) == list(line)[i:i+len(x)]:
+                        t.append(digitsmap[x])
 
-    res.append(f"{t[0]}{t[-1]}")
+        res.append(f"{t[0]}{t[-1]}")
+    return res
 
-print(sum([int(x) for x in res]))
+
+input = open("01/input.txt").read().splitlines()
+
+res1 = sum([int(x) for x in concat_first_last_digit(input)])
+res2 = sum([int(x) for x in concat_first_last_digit(input, solve_part_two=True)])
+print(f"1* Result: {res1}")
+print(f"2* Result: {res2}")
