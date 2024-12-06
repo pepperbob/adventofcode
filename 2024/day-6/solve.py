@@ -61,19 +61,18 @@ for v in set(visited_positions):
     obstacled_map = put_obstacle(v, origin_map)
     guard = guard_start
     directions = origin_directions
-    loop_detector = {}
+    loop_detector = set() 
 
     while within_bounds(bounds, guard):
         guard, directions, _ = move(guard, directions, obstacled_map)
-        loop_detector[guard] = loop_detector.get(guard, 0) + 1
+        pos_fingerprint = (guard, directions[0])
 
-        # approximation for infinity
-        if loop_detector[guard] > 5:
-            # print("Found loop", loop_detector)
+        if pos_fingerprint in loop_detector:
             print("Loop Found: ", guard)
-            # print_map(obstacled_map)
             loop_count += 1
             break;
+        else:
+            loop_detector.add(pos_fingerprint)
 
         # print_map(obstacled_map)
         # input("..")
