@@ -1,6 +1,9 @@
 
 data = [x.split(": ") for x in open("input").read().splitlines()]
 
+def concat(a, b):
+    return a*100+b
+
 class Item(object):
     def __init__(self, expected, start = 0):
         self.expected = expected
@@ -19,7 +22,7 @@ class Item(object):
             self.child.append(Item(self.expected, self.current + no))
             self.child.append(Item(self.expected, self.current * no))
             if RUN_SOLUTION_2:
-                self.child.append(Item(self.expected, int(str(self.current) + str(no))))
+                self.child.append(Item(self.expected, concat(self.current, no)))
         else:
             for c in self.child:
                 c.append(no)
