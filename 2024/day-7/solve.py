@@ -1,7 +1,9 @@
+import math
 
 data = [x.split(": ") for x in open("input").read().splitlines()]
 
 def concat(a, b):
+    # this works because b < 100
     return a*100+b
 
 class Item(object):
@@ -31,7 +33,6 @@ class Item(object):
         if not self.child:
             return 1 if self.current == self.expected else 0
         return sum([c.number_match_expected() for c in self.child])
-
 
 RUN_SOLUTION_2 = True
 
