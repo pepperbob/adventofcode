@@ -1,4 +1,5 @@
 from itertools import combinations, count
+from collections import defaultdict
 
 class Point(object):
     def __init__(self, x: int, y: int):
@@ -30,13 +31,11 @@ class Point(object):
 
 the_map = open("input").read().splitlines()
 upper_bound = (len(the_map)-1, len(the_map[0])-1)
-antennas = {}
+antennas = defaultdict(list) 
 for xi, x in enumerate(the_map):
     for yi, y in enumerate(x):
         if y != ".":
-            pp = antennas.get(y, [])
-            pp.append(Point(xi, yi))
-            antennas[y] = pp
+            antennas[y].append(Point(xi, yi))
 
 ### solution 1
 antinodes = set() 
