@@ -1,7 +1,7 @@
 
 data = open("input").read().strip() + "0"
 disk = []
-nodes = {}
+nodes = {} # keep track of file blocks
 for i, b in enumerate(zip(data[::2], data[1::2])):
     fsize = int(b[0])
     space = int(b[1])
@@ -9,21 +9,8 @@ for i, b in enumerate(zip(data[::2], data[1::2])):
     disk.extend([i]*fsize)
     disk.extend([None]*space)
 
-    # store start-index, end-index, size, space, file start, file end
-    nodes[i] = [start, start+fsize, fsize, space, start, start+fsize]
-
-DISK_SIZE = len(disk)
-USED_SPACE = len([x for x in disk if x is not None])
-FREE_SPACE = len([x for x in disk if x is None])
-
-print("Size:", DISK_SIZE, "Used:", USED_SPACE, "Free:", FREE_SPACE)
-input("Press Any Key to Defrag")
-
-def find_last(dsk, excluding):
-    for i in range(DISK_SIZE-1, excluding, -1):
-        if dsk[i] is not None:
-            return i
-    return None
+    # store block end, space, file start, file size
+    nodes[i] = [start+fsize, space, start, fsize]
 
 def calc_checksum(dsk):
     solution = 0
@@ -37,39 +24,35 @@ def find_free_space(nnodes, ofsize, stop):
     for i, k in enumerate(nnodes.values()):
         if i >= stop:
             break
-
-        if k[3] >= ofsize:
+        if k[1] >= ofsize:
             return i 
-
     return None
 
-def print_disk(dsk):
-    print("".join(["." if i is None else str(i) for i in dsk]))
-
+# iterate from the back
 for i in range(max(nodes.keys()), -1, -1):
-    start = nodes[i][0]
-    end = nodes[i][1]
-    size = nodes[i][2]
-    fstart = nodes[i][4] 
-    fend = nodes[i][5] 
 
-    block_with_free_idx = find_free_space(nodes, fend-fstart, i) 
+    fstart = nodes[i][2] 
+    filesize = nodes[i][3] 
+
+    # find file index with enough space to keep the current file
+    block_with_free_idx = find_free_space(nodes, filesize, i) 
 
     if block_with_free_idx is None:
+        # no space, skip this file
         continue
-    
-    for ii, m in enumerate(range(fstart, fend)):
+   
+    # copy file to free space
+    for ii, m in enumerate(range(fstart, fstart+filesize)):
         # append to the end
-        target_idx = nodes[block_with_free_idx][1]+ii
+        target_idx = nodes[block_with_free_idx][0]+ii
         disk[target_idx] = disk[m]
         disk[m] = None
-        # insert stuff
 
     # update occupied end position
-    nodes[block_with_free_idx][1] += size
-    # update free size
-    nodes[block_with_free_idx][2] += size-1
-    nodes[block_with_free_idx][3] -= size
+    nodes[block_with_free_idx][0] += filesize
+
+    # uppdate space left in block
+    nodes[block_with_free_idx][1] -= filesize
 
 print("Solution 2", calc_checksum(disk))
 
